@@ -97,4 +97,18 @@ I wrote most of this around the introduction of Java nio.2. It overrides the def
 
 HalfPipe launches with this as it's FileSystemProvider. I plan to make this the arm jdk 21 relase leaving the jdk 20 as the x86.
 
+```
+#!/bin/bash
 
+sudo xcode-select --switch /Applications/Xcode_13.1.app/
+SDK_ROOT="$(xcrun --show-sdk-path)"
+JDK="$(/usr/libexec/java_home)"
+SDK_HDRS="$(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Foundation.framework/Versions/C/Headers/"
+SDK_FRAMEWORKS=$(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks
+gcc -Ijni_src -I/Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/System/Library/Frameworks/JavaNativeFoundation.framework/Versions/A/Headers \
+    -I${SDK_HDRS} -I${JDK}/include -I${JDK}/include/darwin -Ifsws/include \
+    -L/Users/mjh/Documents/JavaNativeFoundation/ -lJavaNativeFoundation \
+    -arch arm64 -o libmacattrs.dylib -dynamiclib -F${SDK_FRAMEWORKS} -framework Foundation -framework CoreServices -framework AppKit *.m fsws/*.c
+    
+install_name_tool -change "libJavaNativeFoundation.dylib" "@loader_path/libJavaNativeFoundation.dylib" "libmacattrs.dylib"
+```
