@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# In order to include JavaNativeFoundation headers this is based on 
+# https://macosx-port-dev.openjdk.java.narkive.com/QZT8BXTT/is-javanativefoundation-still-supported-on-os-x-10-10
+# see also
+# https://github.com/apple/openjdk/
+sudo xcode-select --switch /Applications/Xcode_13.1.app/
+SDK_ROOT="$(xcrun --show-sdk-path)"
+SDK_HDRS="$(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Foundation.framework/Versions/C/Headers/"
+SDK_FRAMEWORKS=$(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks
+JDK="$(/usr/libexec/java_home)"
+
+gcc -I. -I${JDK}/include -I${JDK}/include/darwin \
+    -I$SDK_HDRS -arch arm64 -o libJavaNativeFoundation.dylib -dynamiclib \
+    -F${SDK_FRAMEWORKS} -framework Cocoa JavaNativeFoundation/*.m 
